@@ -1,10 +1,9 @@
 def simular_pessoa(pessoa, empresas, categorias, percentuais):
-    # Zera o conforto do mês e calcula o rendimento
     pessoa.conforto = 0
     pessoa.rendimento_mensal = pessoa.salario + (pessoa.patrimonio * 0.05)
-    pessoa.patrimonio += pessoa.salario
+    
+    gastos_do_mes = 0
 
-    # Itera sobre cada categoria de gasto
     for i, categoria in enumerate(categorias):
         orcamento_categoria = pessoa.rendimento_mensal * percentuais[i]
         
@@ -12,30 +11,38 @@ def simular_pessoa(pessoa, empresas, categorias, percentuais):
         if not empresas_da_categoria:
             continue
 
-        # Tenta comprar o de maior qualidade dentro do orçamento
         compras_possiveis = [e for e in empresas_da_categoria if e.get_preco() <= orcamento_categoria]
         
         compra_realizada = None
+        usou_patrimonio_emergencia = False
+
         if compras_possiveis:
-            # Maximiza o conforto
             compra_realizada = max(compras_possiveis, key=lambda e: e.qualidade)
         else:
-            # Se não pode pagar com o rendimento, usa o patrimônio para o mais barato
-            # para não ficar desamparado
             mais_barata = min(empresas_da_categoria, key=lambda e: e.get_preco())
             if pessoa.patrimonio >= mais_barata.get_preco():
                 compra_realizada = mais_barata
+                usou_patrimonio_emergencia = True
         
-        # Efetiva a compra
         if compra_realizada:
             preco = compra_realizada.get_preco()
-            pessoa.patrimonio -= preco
+            
+            if usou_patrimonio_emergencia:
+                #Sai direto do patrimônio
+                pessoa.patrimonio -= preco
+            else:
+                #Gasto do mês
+                gastos_do_mes += preco
+            
             pessoa.conforto += compra_realizada.qualidade
             
             compra_realizada.oferta -= 1
             compra_realizada.vendas += 1
             compra_realizada.lucro_total += (preco - compra_realizada.custo)
-
+    
+    # No final do mês, o que sobrou do rendimento vira poupança e aumenta o patrimônio
+    poupanca = pessoa.rendimento_mensal - gastos_do_mes
+    pessoa.patrimonio += poupanca
 
 def simular_empresa(empresa):
     # Ajusta estratégia com base nas vendas do mês

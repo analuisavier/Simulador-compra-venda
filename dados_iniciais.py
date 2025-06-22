@@ -26,8 +26,6 @@ def populacao_pessoas():
 
     
 
-
-
 def populacao_empresas():
     empresas.append(Empresa("Moradia",     "    República A", "Aluguel, Várzea", 300.0,  qualidade=3))
     empresas.append(Empresa("Moradia",     "    República B", "Aluguel, Várzea", 300.0,  qualidade=3))

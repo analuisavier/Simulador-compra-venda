@@ -17,43 +17,72 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def print_pessoas(pessoas):
-    print(f"{cor_roxo}[PESSOAS]{reset}")
-    divisao = f"Divisão do rend. mensal: | Moradia {percentuais[0]*100:.1f}% | Alimentação {percentuais[1]*100:.1f}% | Transporte {percentuais[2]*100:.1f}% | Saúde {percentuais[3]*100:.1f}% | Educação {percentuais[4]*100:.1f}% | Totalizando {sum(percentuais)*100:.1f}% do rend. mensal total."
-    print(f"{cor_branco}{divisao}{reset}")
-    
-    # Lógica para o gráfico de barras
-    print(f"Gráfico de Barras | Legenda: {cor_ciano}Conforto{reset}, {cor_amarelo}Salário{reset}, {cor_verde}Rendimentos{reset}")
-    
-    max_valor = 0
-    for p in pessoas:
-        max_atual = max(p.conforto, p.salario, p.rendimento_mensal)
-        if max_atual > max_valor:
-            max_valor = max_atual
-    
-    escala = 80 / max_valor if max_valor > 0 else 0
+    print(f"\n[PESSOAS]")
+    divisao = f"Divisão do renda mensal | Moradia {cor_amarelo}{percentuais[0]*100:.1f}%{reset} | Alimentação {cor_amarelo}{percentuais[1]*100:.1f}%{reset} | Transporte {cor_amarelo}{percentuais[2]*100:.1f}% {reset} | Saúde {cor_amarelo}{percentuais[3]*100:.1f}%{reset} | Educação {cor_amarelo}{percentuais[4]*100:.1f}%{reset} | Totalizando {cor_amarelo}{sum(percentuais)*100:.1f}%{reset} da renda mensal total."
+    print(f"{cor_branco}{italico}{divisao}{reset}{reset}")
+    print(f"{italico}Gráfico de Barras | Legenda: {italico}{cor_azul}Conforto{reset}{italico}, {cor_verde}Salário{reset}{italico}, {cor_roxo}Rendimentos{reset}{italico} | Cada traço = R$1000.00{reset}\n")
 
-    for i, p in enumerate(pessoas):
-        bar_conforto = int(p.conforto * escala)
-        bar_salario = int(p.salario * escala)
-        bar_rendimento = int(p.rendimento_mensal * escala)
-        
-        print(f"{cor_ciano}{'|' * bar_conforto}{reset}")
-        print(f"{cor_amarelo}{'|' * bar_salario}{reset}")
+    #listas
+    conforto_linhas = []
+    rendimento_linhas = []
+
+    for p in pessoas:
+        conforto_barras = int(round((p.conforto / len(percentuais)) ))
+        conforto_barras = min(conforto_barras, 10)
+        conforto_linhas.append([cor_azul + "|" + reset] * conforto_barras)
+
+        rendimento_patrimonial = p.patrimonio * 0.05
+        salario = p.salario
+        total_rendimento = salario + rendimento_patrimonial
+        total_barras = min(int(total_rendimento // 1000), 10)
+
+        barras_salario = min(int(salario // 1000), total_barras)
+        barras_patrimonio = total_barras - barras_salario
+
+        barras = [cor_roxo + "|" + reset] * barras_patrimonio + [cor_verde + "|" + reset] * barras_salario
+        rendimento_linhas.append(barras)
+
+    max_conforto = max(len(c) for c in conforto_linhas)
+    for i in range(max_conforto):
+        linha = ""
+        for c in conforto_linhas:
+            linha += c[i] if i < len(c) else " "
+        print(linha)
+
+    #Separador
+    print(cor_branco + ("----") * 40 + reset)
+
+    for nivel in reversed(range(10)):
+        linha = ""
+        for barras in rendimento_linhas:
+            if nivel < len(barras):
+                linha += barras[nivel]
+            else:
+                linha += " "
+        print(linha)
+
+def mostrar_vendas(vendas):
+    if vendas >= 5:
+        return cor_verde + ("$" * (vendas // 5)) + reset
+    else:
+        return ""
+    
+    
 def print_empresas(empresas):
-    print(f"\n{cor_roxo}[EMPRESAS]{reset}")
+    print(f"\n{cor_branco}[EMPRESAS]{reset}")
     for empresa in empresas:
         preco = empresa.get_preco()
         lucro_mes = empresa.vendas * (preco - empresa.custo)
         
         cat = f"[{empresa.categoria}]"
         nome_prod = f"{empresa.nome}: {empresa.produto}"
-        qual_marg = f"(Q:{empresa.qualidade} Margem: {empresa.margem:.1%})"
-        custo_str = f"Custo: R$ {empresa.custo:<8.2f}"
-        preco_str = f"Preço: R$ {preco:<8.2f}"
-        lucro_str = f"Lucro T.: R$ {empresa.lucro_total:<8.2f}"
-        vendas_str = f"Vendas: {empresa.vendas}"
+        qual_marg = f"{cor_ciano}Q:{empresa.qualidade}{reset} Margem: {cor_amarelo}{empresa.margem:.1%}{reset}"
+        custo_str = f"Custo:{cor_vermelho} R$ {empresa.custo:<8.2f}{reset}"
+        preco_str = f"Preço:{cor_verde} R$ {preco:<8.2f}{reset}"
+        lucro_str = f"Lucro T.:{cor_verde} R$ {empresa.lucro_total:<8.2f}{reset}"
+        vendas_str = f"Vendas: {mostrar_vendas(empresa.vendas)}"
         
-        print(f"{cor_ciano}{cat:<14}{reset}{cor_branco}{nome_prod:<38}{qual_marg:<22}{custo_str:<22}{preco_str:<22}{lucro_str:<25}{vendas_str}{reset}")
+        print(f"{cat:<14}{nome_prod:<38}{qual_marg:<22}      {custo_str:<22}       {preco_str:<22}        {lucro_str:<25}       {vendas_str}{reset}")
 
 def main():
     populacao_pessoas()
