@@ -45,18 +45,18 @@ def simular_pessoa(pessoa, empresas, categorias, percentuais):
     pessoa.patrimonio += poupanca
 
 def simular_empresa(empresa):
-    # Se não vendeu nada no mês, aumenta a margem para tentar compensar
-    if empresa.vendas == 0:
-        empresa.margem += 0.01
-    # Se a oferta acabou, aumenta reposição
+    # Se vendeu tudo (oferta zerou)
     if empresa.oferta == 0:
         empresa.reposicao += 1
-    # Se a oferta está alta E houve vendas, reduz reposição e margem
-    elif empresa.oferta >= 10 and empresa.vendas > 0:
-        empresa.reposicao -= 1
+        empresa.margem += 0.01
+    # Se ao final do mês ainda tem 10 produtos ou mais na oferta
+    elif empresa.oferta >= 10:
+        empresa.reposicao = max(1, empresa.reposicao - 1)
         empresa.margem -= 0.01
-        if empresa.margem < 0.0:
-            empresa.margem = 0
+    # Limita a margem mínima em 0%
+    if empresa.margem < 0.0:
+        empresa.margem = 0.0
+
 
 def simular_mercado(pessoas, empresas, categorias, percentuais):
     # 0 Empresas ajustam suas estratégias antes de repor estoque
@@ -69,3 +69,19 @@ def simular_mercado(pessoas, empresas, categorias, percentuais):
     # 2 Pessoas recebem e gastam
     for pessoa in pessoas:
         simular_pessoa(pessoa, empresas, categorias, percentuais)
+    # 3 Ajuste pós-vendas: se empresa não vendeu nada, aumenta margem e reduz reposição
+    for empresa in empresas:
+        if empresa.vendas == 0:
+            empresa.margem += 0.01
+            empresa.reposicao = max(1, empresa.reposicao - 1)
+            empresa.meses_sem_venda += 1
+            #Se ficar 1 meses sem vender, faz reset de estratégia
+            if empresa.meses_sem_venda >= 1:
+                empresa.oferta = 0  # Zera estoque
+                empresa.margem *= 0.958  # Margem inicial
+                empresa.reposicao = 10  # Reposição inicial
+                empresa.meses_sem_venda = 0
+
+        else:
+            empresa.meses_sem_venda = 0
+   

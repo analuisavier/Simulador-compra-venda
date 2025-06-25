@@ -10,6 +10,7 @@ class Empresa:
         self.reposicao = 10
         self.vendas = 0
         self.lucro_total = 0.0
+        self.meses_sem_venda = 0  
 
     def get_preco(self):
         return self.custo * (1 + self.margem)
