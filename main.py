@@ -72,8 +72,6 @@ def print_empresas(empresas):
     print(f"\n{cor_branco}[EMPRESAS]{reset}")
     for empresa in empresas:
         preco = empresa.get_preco()
-        lucro_mes = empresa.vendas * (preco - empresa.custo)
-        
         cat = f"[{empresa.categoria}]"
         nome_prod = f"{empresa.nome}: {empresa.produto}"
         qual_marg = f"{cor_ciano}Q:{empresa.qualidade}{reset} Margem: {cor_amarelo}{empresa.margem:.1%}{reset}"

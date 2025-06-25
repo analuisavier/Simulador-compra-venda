@@ -45,27 +45,27 @@ def simular_pessoa(pessoa, empresas, categorias, percentuais):
     pessoa.patrimonio += poupanca
 
 def simular_empresa(empresa):
-    # Ajusta estratégia com base nas vendas do mês
+    # Se vendeu tudo (estoque zerou)
     if empresa.oferta == 0:
         empresa.reposicao += 1
-        empresa.margem += 0.01  # Aumenta margem em 1%
+        empresa.margem += 0.01
+    # Se ainda tem 10 ou mais produtos em estoque
     elif empresa.oferta >= 10:
-        if empresa.reposicao > 1: # Evita reposição negativa
-             empresa.reposicao -= 1
-        empresa.margem -= 0.01  # Diminui margem em 1%
-        if empresa.margem < 0: # Evita margem negativa
+        if empresa.reposicao > 1:
+            empresa.reposicao -= 1
+        empresa.margem -= 0.01
+        if empresa.margem < 0:
             empresa.margem = 0
 
 def simular_mercado(pessoas, empresas, categorias, percentuais):
-    # 1. Empresas repõem o estoque e zeram as vendas do mês
+    # 0. Empresas ajustam suas estratégias para o próximo mês (ANTES de repor estoque)
+    for empresa in empresas:
+        simular_empresa(empresa)
+    # 1 Empresas repõem o estoque e zeram as vendas do mês
     for empresa in empresas:
         empresa.oferta += empresa.reposicao
         empresa.vendas = 0
 
-    # 2. Pessoas recebem e gastam
+    # 2 Pessoas recebem e gastam
     for pessoa in pessoas:
         simular_pessoa(pessoa, empresas, categorias, percentuais)
-
-    # 3. Empresas ajustam suas estratégias para o próximo mês
-    for empresa in empresas:
-        simular_empresa(empresa)
