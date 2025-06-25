@@ -61,17 +61,16 @@ def print_pessoas(pessoas):
                 linha += " "
         print(linha)
 
-def mostrar_vendas(vendas):
-    max_cifroes = 20
-    if vendas >= 5:
-        qtd = vendas // 5
-        if qtd > max_cifroes:
-            return cor_verde + ("$" * max_cifroes) + f"... ({vendas} vendas)" + reset
-        else:
-            return cor_verde + ("$" * qtd) + reset
-    else:
+def mostrar_vendas(vendas, limite_sinais = 10):
+    if vendas < 5:
         return ""
     
+    quantidade_sinais = vendas // 5
+    if quantidade_sinais > limite_sinais:
+        exedente =  quantidade_sinais - limite_sinais
+        return cor_verde + ("$"* limite_sinais) + f"+{exedente}" + reset
+    else:
+        return cor_verde + ("$" * quantidade_sinais) + reset
     
 def print_empresas(empresas):
     print(f"\n{cor_branco}[EMPRESAS]{reset}")
@@ -85,7 +84,6 @@ def print_empresas(empresas):
         lucro_str = f"Lucro T.:{cor_verde} R$ {empresa.lucro_total:<8.2f}{reset}"
         vendas_str = f"Vendas:{mostrar_vendas(empresa.vendas)}"
         print(f"{cat:<14}{nome_prod:<38}{qual_marg:<22}      {custo_str:<22}       {preco_str:<22}        {lucro_str:<25}       {vendas_str}")
-    print()
 
 def main():
     populacao_pessoas()
